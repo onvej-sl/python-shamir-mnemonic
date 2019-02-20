@@ -228,18 +228,18 @@ class ShamirMnemonic(object):
         )
 
     @classmethod
-    def _encrypt(cls, master_secret, passphrase, identifier):
-        l = master_secret[: len(master_secret) // 2]
-        r = master_secret[len(master_secret) // 2 :]
+    def _encrypt(cls, pre_master_secret, passphrase, identifier):
+        l = pre_master_secret[: len(pre_master_secret) // 2]
+        r = pre_master_secret[len(pre_master_secret) // 2 :]
         salt = cls._get_salt(identifier)
         for i in range(cls.ROUND_COUNT):
             (l, r) = (r, cls.xor(l, cls._round_function(i, passphrase, salt, r)))
         return r + l
 
     @classmethod
-    def _decrypt(cls, pre_master_secret, passphrase, identifier):
-        l = pre_master_secret[: len(pre_master_secret) // 2]
-        r = pre_master_secret[len(pre_master_secret) // 2 :]
+    def _decrypt(cls, master_secret, passphrase, identifier):
+        l = master_secret[: len(master_secret) // 2]
+        r = master_secret[len(master_secret) // 2 :]
         salt = cls._get_salt(identifier)
         for i in reversed(range(cls.ROUND_COUNT)):
             (l, r) = (r, cls.xor(l, cls._round_function(i, passphrase, salt, r)))
@@ -488,7 +488,7 @@ class ShamirMnemonic(object):
                 )
             )
 
-        pre_master_secret = self._encrypt(master_secret, passphrase, identifier)
+        pre_master_secret = self._decrypt(master_secret, passphrase, identifier)
         shares = self._generate_shares(
             threshold, share_count, pre_master_secret, starter_shares
         )
@@ -549,6 +549,6 @@ class ShamirMnemonic(object):
 
         identifier, thresholds, shares = self._decode_mnemonics(mnemonics)
 
-        return self._decrypt(
+        return self._encrypt(
             self._combine_shares(shares, thresholds), passphrase, identifier
         )
