@@ -514,7 +514,7 @@ class ShamirMnemonic(object):
         :rtype: List of byte arrays.
         """
 
-        if len(master_secret) * 8 < self.MIN_STRENGTH_BITS:
+        if strength_bits < self.MIN_STRENGTH_BITS:
             raise ValueError(
                 "The requested strength of the master secret ({} bits) must be at least {} bits.".format(
                     strength_bits, self.MIN_STRENGTH_BITS
