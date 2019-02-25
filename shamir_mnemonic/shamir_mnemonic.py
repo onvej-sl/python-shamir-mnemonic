@@ -224,7 +224,7 @@ class ShamirMnemonic(object):
     @classmethod
     def _get_salt(cls, identifier):
         return cls.CUSTOMIZATION_STRING + bytes(
-            b for i in identifier for b in (i >> 8, i & 0xFF)
+            b for i in identifier for b in (i & 0xFF, i >> 8)
         )
 
     @classmethod
